@@ -192,10 +192,6 @@ export default function Dashboard() {
 
         <div className="header-right">
           <button className="btn-historial">Ver Historial</button>
-          <div className="modelo-actual">
-            <span>Modelo Actual</span>
-            <p>Random Forest Classifier v2.1</p>
-          </div>
         </div>
       </header>
 
@@ -227,11 +223,44 @@ export default function Dashboard() {
       <section className="confusion-matrix">
         <h2>Matriz de Confusión</h2>
         <div className="matrix-grid" id="confusionMatrix">
-          {/* Aquí puedes renderizar dinámicamente los valores */}
-          <div className="matrix-cell">TP</div>
-          <div className="matrix-cell">FP</div>
-          <div className="matrix-cell">FN</div>
-          <div className="matrix-cell">TN</div>
+          {/* Renderizar dinámicamente usando la respuesta `metrics` */}
+          {(() => {
+            // soportar varios nombres que pueda devolver el backend
+            const confusion =
+              metrics?.Matriz_de_Confusion ??
+              metrics?.matriz_de_confusion ??
+              metrics?.confusion_matrix ??
+              metrics?.confusionMatrix ??
+              null;
+
+            // formato seguro para mostrar números; si no hay datos, mostramos etiquetas
+            const fmt = (v) => (typeof v === 'number' ? new Intl.NumberFormat().format(v) : '--');
+
+            if (Array.isArray(confusion) && confusion.length >= 2 && Array.isArray(confusion[0]) && Array.isArray(confusion[1])) {
+              const TP = confusion[0][0];
+              const FP = confusion[0][1];
+              const FN = confusion[1][0];
+              const TN = confusion[1][1];
+              return (
+                <>
+                  <div className="matrix-cell">{fmt(TP)}</div>
+                  <div className="matrix-cell">{fmt(FP)}</div>
+                  <div className="matrix-cell">{fmt(FN)}</div>
+                  <div className="matrix-cell">{fmt(TN)}</div>
+                </>
+              );
+            }
+
+            // Fallback: mostrar las etiquetas estáticas si no hay datos
+            return (
+              <>
+                <div className="matrix-cell">TP</div>
+                <div className="matrix-cell">FP</div>
+                <div className="matrix-cell">FN</div>
+                <div className="matrix-cell">TN</div>
+              </>
+            );
+          })()}
         </div>
       </section>
 
